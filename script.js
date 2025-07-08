@@ -1,6 +1,8 @@
 
             const canvas = document.querySelector("canvas")
             const context = canvas.getContext('2d')
+            //const headImg = new Image();
+            //headImg.src = "img/snake.png";
             const apple = new Image();
             apple.src = "img/applered.png"
 
@@ -37,12 +39,50 @@
                 context.clearRect(0,0,400,400)
 
                 for(let i = 0; i < snake.length; i++){
-                    context.fillStyle = (i ==0) ? "green" : "green"
-                    context.fillRect(snake[i].x, snake[i].y, box, box)
-                    context.strokeStyle = "green" ;
-                    context.strokeRect(snake[i].x, snake[i].y, box, box);
+                    if ( i ===0 ) {
+                        context.fillStyle = ( i === 0) ? "green" : "green" 
+                        context.fillRect(snake[i].x, snake[i].y, box, box);
+                    } else if (i === snake.length - 1) {
+                        // Tail → triangle
+                        const tail = snake[i];
+                        const beforeTail = snake[i - 1];
+                
+                        let dx = tail.x - beforeTail.x;
+                        let dy = tail.y - beforeTail.y;
+                
+                        context.fillStyle = "green";
+                        context.beginPath();
+                
+                        if (dx === box) {
+                            // queue va vers la droite
+                            context.moveTo(tail.x + box, tail.y + box / 2); // pointe
+                            context.lineTo(tail.x, tail.y); // coin haut gauche
+                            context.lineTo(tail.x, tail.y + box); // coin bas gauche
+                        } else if (dx === -box) {
+                            // queue va vers la gauche
+                            context.moveTo(tail.x, tail.y + box / 2);
+                            context.lineTo(tail.x + box, tail.y);
+                            context.lineTo(tail.x + box, tail.y + box);
+                        } else if (dy === box) {
+                            // queue va vers le bas
+                            context.moveTo(tail.x + box / 2, tail.y + box);
+                            context.lineTo(tail.x, tail.y);
+                            context.lineTo(tail.x + box, tail.y);
+                        } else if (dy === -box) {
+                            // queue va vers le haut
+                            context.moveTo(tail.x + box / 2, tail.y);
+                            context.lineTo(tail.x, tail.y + box);
+                            context.lineTo(tail.x + box, tail.y + box);
+                        }
+                        context.fill();
 
-                }
+                }else {
+                    // Corps
+                    context.fillStyle = "green";
+                    context.fillRect(snake[i].x, snake[i].y, box, box);
+                    context.strokeStyle = "green";
+                    context.strokeRect(snake[i].x, snake[i].y, box, box);
+                }}
 
                 
                 context.drawImage(apple, food.x, food.y, box, box);
@@ -77,6 +117,13 @@
                 // Affiche Game Over et le bouton Rejouer
                 document.getElementById("gameOver").style.display = "block";
                 document.getElementById("restartBtn").style.display = "inline-block";
+               
+                context.fillStyle = "red";
+                context.font = "30px Arial";
+                context.fillText("Score : " + score, 6.5 * box, 11.5 * box);
+            
+                // Met à jour le texte HTML aussi
+                document.getElementById("finalScore").innerText = "Votre score : " + score;
                 return;
             }
 
@@ -120,3 +167,29 @@
             game = setInterval(draw, 100);
         });
         
+        let savedScores = []; // tableau des scores (tu peux utiliser localStorage si tu veux plus tard)
+
+document.getElementById("saveScore").addEventListener("click", function() {
+    const playerName = document.getElementById("playerName").value.trim();
+    
+    if (playerName !== "") {
+        savedScores.push({ name: playerName, score: score });
+
+        // Met à jour l’affichage des scores
+        updateScoreList();
+
+        // Réinitialise le champ
+        document.getElementById("playerName").value = "";
+    }
+});
+
+function updateScoreList() {
+    const list = document.getElementById("scoreList");
+    list.innerHTML = ""; // vide la liste
+
+    savedScores.forEach(entry => {
+        const li = document.createElement("li");
+        li.textContent = `${entry.name} : ${entry.score}`;
+        list.appendChild(li);
+    });
+}
