@@ -117,6 +117,7 @@
                 // Affiche Game Over et le bouton Rejouer
                 document.getElementById("gameOver").style.display = "block";
                 document.getElementById("restartBtn").style.display = "inline-block";
+                document.getElementById("scoring").style.display = "block";
                
                 context.fillStyle = "red";
                 context.font = "30px Arial";
@@ -145,6 +146,7 @@
         }
 
         let game = setInterval(draw, 100)
+        
 
 
         document.getElementById("restartBtn").addEventListener("click", function() {
@@ -161,6 +163,7 @@
             // Cache Game Over et bouton
             document.getElementById("gameOver").style.display = "none";
             document.getElementById("restartBtn").style.display = "none";
+            
         
             // Redémarre le jeu
             clearInterval(game); // Sécurité
@@ -169,19 +172,26 @@
         
         let savedScores = []; // tableau des scores (tu peux utiliser localStorage si tu veux plus tard)
 
-document.getElementById("saveScore").addEventListener("click", function() {
-    const playerName = document.getElementById("playerName").value.trim();
-    
-    if (playerName !== "") {
-        savedScores.push({ name: playerName, score: score });
-
-        // Met à jour l’affichage des scores
-        updateScoreList();
-
-        // Réinitialise le champ
-        document.getElementById("playerName").value = "";
-    }
-});
+        document.getElementById("SaveScore").addEventListener("click", function() {
+            const playerName = document.getElementById("playerName").value.trim();
+        
+            if (playerName !== "") {
+                fetch('save_score.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `name=${encodeURIComponent(playerName)}&score=${score}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert("Score enregistré !");
+                })
+                .catch(error => {
+                    alert("Erreur lors de l'enregistrement.");
+                });
+            }
+        });
 
 function updateScoreList() {
     const list = document.getElementById("scoreList");

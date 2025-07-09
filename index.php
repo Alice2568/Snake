@@ -12,7 +12,7 @@
         </header>
         <h1>Snake</h1>
         <canvas width="400" height="400"></canvas>
-        <div style="display:none;">
+        <div id="scoring" style="display:none;">
             <h3 id="finalScore"></h3>
             <label for="playerName">Votre pseudo : </label>
             <input type="text" id="playerName" placeholder="Entrez votre pseudo">
